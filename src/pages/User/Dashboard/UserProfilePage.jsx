@@ -30,6 +30,9 @@ const PersonalInfoForm = ({ userData, setUserData, onSaveSuccess }) => {
             formData.append("name", userData.name);
             formData.append("phone", userData.phone);
             formData.append("address", userData.address || "");
+            formData.append("state", userData.state || "");
+            formData.append("country", userData.country || "");
+            formData.append("street", userData.street || "");
             if (userData.profilePicture instanceof File) formData.append("profilePicture", userData.profilePicture);
             if (userData.licenseFrontImage instanceof File) formData.append("licenseFrontImage", userData.licenseFrontImage);
             if (userData.licenseBackImage instanceof File) formData.append("licenseBackImage", userData.licenseBackImage);
@@ -77,7 +80,10 @@ const PersonalInfoForm = ({ userData, setUserData, onSaveSuccess }) => {
                 <InputField label="Full Name" value={userData.name} onChange={e => setUserData({ ...userData, name: e.target.value })} />
                 <InputField label="Email" value={userData.email} readOnly />
                 <InputField label="Phone" value={userData.phone} onChange={e => setUserData({ ...userData, phone: e.target.value })} />
+                <InputField label="Country (Optional)" value={userData.country || ""} onChange={e => setUserData({ ...userData, country: e.target.value })} />
+                <InputField label="State (Optional)" value={userData.state || ""} onChange={e => setUserData({ ...userData, state: e.target.value })} />
                 <InputField label="Address (Optional)" value={userData.address || ""} onChange={e => setUserData({ ...userData, address: e.target.value })} />
+                <InputField label="Street (Optional)" value={userData.street || ""} onChange={e => setUserData({ ...userData, street: e.target.value })} />
 
                 <div className="flex justify-end mt-6">
                     <button type="button" disabled={loading} onClick={handleSave} className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">

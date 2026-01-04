@@ -55,6 +55,9 @@ import CookieConsent from './components/CookieConsent';
 import UserProfilePage from './pages/User/Dashboard/UserProfilePage';
 import PaymentSuccess from './pages/PaymentSuccess';
 import PaymentCancel from './pages/PaymentCancel';
+import ForgetPasswordPage from './pages/Auth/ForgetPasswordPage';
+import VerifyOtpPage from './pages/Auth/VerifyOtpPage';
+import ChangePasswordPage from './pages/Auth/ChangePasswordPage';
 const RegisterPage = lazy(() => import('./pages/Auth/RegisterPage'));
 const AdminLayout = lazy(() => import('./components/admin/Layout'));
 const UserLayout = lazy(() => import('./components/user/Layout'));
@@ -153,6 +156,9 @@ function App() {
 
             <Route path='/login' element={<LoginPage />} />
             <Route path='/register' element={<RegisterPage />} />
+            <Route path='/forget-password' element={<ForgetPasswordPage />} />
+            <Route path='/verify-otp' element={<VerifyOtpPage />} />
+            <Route path='/change-password' element={<ChangePasswordPage />} />
             <Route path='/verify' element={<VerifyPage />} />
 
             <Route path="/payment-success" element={<PaymentSuccess />} />

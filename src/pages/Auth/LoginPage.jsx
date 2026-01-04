@@ -203,6 +203,11 @@ const LoginPage = () => {
             <label className='block text-sm mb-1'>{translations.passwordLabel}</label>
             <input type='password' required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={translations.passwordPlaceholder} className='block w-full px-4 py-2 border border-gray-300 rounded-md' />
           </motion.div>
+          <motion.div variants={fadeInUp} className="text-right mb-4 -mt-6">
+            <Link to="/forget-password" className="text-blue-600 hover:text-blue-500 text-sm">
+              Forgot Password?
+            </Link>
+          </motion.div>
           <motion.div variants={fadeInUp}>
             <button type='submit' className='w-full py-2 px-4 text-white bg-blue-600 rounded-md'>{translations.loginBtn}</button>
           </motion.div>
@@ -226,7 +231,6 @@ const LoginPage = () => {
             </button>
           </LoginSocialFacebook> */}
         </div>
-
         <motion.div variants={fadeInUp} className='mt-8 text-center text-sm'>
           <p>{translations.noAccount} <Link to={"/register"} className='text-blue-600 hover:text-blue-500'>{translations.signup}</Link></p>
         </motion.div>

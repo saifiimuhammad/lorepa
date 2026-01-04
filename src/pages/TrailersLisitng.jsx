@@ -218,7 +218,7 @@ const TrailersListing = () => {
                   />
                   <div className="p-4">
                     <h3 className="text-lg font-semibold text-gray-800 mb-1">{trailer.title}</h3>
-                    <p className="text-gray-600 text-sm mb-1">{trailer.userId?.email || translations.unknownOwner}</p>
+                    {/* <p className="text-gray-600 text-sm mb-1">{trailer.userId?.email || translations.unknownOwner}</p> */}
                     <p className="text-gray-500 text-xs mb-2">{trailer.city}, {trailer.state}</p>
                     <div className='flex items-center justify-between'>
                       <p className="text-black font-medium text-lg">${trailer.dailyRate}{translations.perDay}</p>

@@ -26,6 +26,26 @@ const calculatePrice = (startDate, endDate, dailyRate) => {
     return diffDays * parseFloat(dailyRate);
 };
 
+const normalizeClosedDates = (closedDates) => {
+    if (!closedDates || !closedDates.length) return [];
+
+    let parsed = closedDates;
+    while (typeof parsed === "string") {
+        try {
+            parsed = JSON.parse(parsed);
+        } catch {
+            break;
+        }
+    }
+    if (Array.isArray(parsed) && typeof parsed[0] === "string") {
+        try {
+            parsed = JSON.parse(parsed[0]);
+        } catch { }
+    }
+    return Array.isArray(parsed) ? parsed : [];
+};
+
+
 const BookingModal = ({ isOpen, onClose, trailer, translations, onSubmit }) => {
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
@@ -49,19 +69,53 @@ const BookingModal = ({ isOpen, onClose, trailer, translations, onSubmit }) => {
         }
     }
 
+    const isDateRangeOverlappingClosedDates = (
+        startDate,
+        endDate,
+        closedDates
+    ) => {
+        if (!startDate || !endDate) return false;
+
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        return closedDates.some((dateStr) => {
+            const closed = new Date(dateStr);
+            return closed >= start && closed <= end;
+        });
+    };
+
+
     const handleSubmit = (e) => {
         e.preventDefault();
+
         if (!startDate || !endDate || numberOfDays <= 0 || price <= 0) {
             toast.error(translations.selectValidDates);
             return;
         }
+        const closedDates = normalizeClosedDates(trailer?.closedDates);
+        const hasConflict = isDateRangeOverlappingClosedDates(
+            startDate,
+            endDate,
+            closedDates
+        );
+
+        if (hasConflict) {
+            toast.error(
+                translations.trailerUnavailable ||
+                "Selected dates include unavailable days"
+            );
+            return;
+        }
+
         onSubmit({
             trailerId: trailer._id,
             startDate,
             endDate,
-            price
+            price,
         });
     };
+
 
     if (!isOpen) return null;
 

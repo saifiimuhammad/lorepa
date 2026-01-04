@@ -20,7 +20,6 @@ export const trailersListingTranslations = {
     rentTrailerButton: "Rent a trailer",
     becomeHostTitle: "Become a host",
     becomeHostDescription: "List your trailer and start earning by helping others move, travel, and explore. It's easy and secure",
-    // --- New Booking Translations ---
     bookNow: "Book Now",
     bookTrailer: "Book Trailer",
     startDate: "Start Date",
@@ -36,6 +35,7 @@ export const trailersListingTranslations = {
     dailyRate: "Daily Rate",
     rentalDays: "Rental Days",
     totalCost: "Total Cost",
+    trailerUnavailable: "Selected dates include unavailable days.",
   },
   es: {
     price: "Precio",
@@ -58,7 +58,6 @@ export const trailersListingTranslations = {
     rentTrailerButton: "Alquilar un remolque",
     becomeHostTitle: "Conviértete en anfitrión",
     becomeHostDescription: "Publica tu remolque y comienza a ganar ayudando a otros a moverse, viajar y explorar. Es fácil y seguro.",
-    // --- New Booking Translations ---
     bookNow: "Reservar Ahora",
     bookTrailer: "Reservar Remolque",
     startDate: "Fecha de inicio",
@@ -74,6 +73,7 @@ export const trailersListingTranslations = {
     dailyRate: "Tarifa diaria",
     rentalDays: "Días de alquiler",
     totalCost: "Costo total",
+    trailerUnavailable: "Las fechas seleccionadas incluyen días no disponibles.",
   },
   cn: {
     price: "价格",
@@ -96,7 +96,6 @@ export const trailersListingTranslations = {
     rentTrailerButton: "租一辆拖车",
     becomeHostTitle: "成为房东",
     becomeHostDescription: "列出您的拖车，通过帮助他人搬家、旅行和探索来开始赚钱。这既简单又安全。",
-    // --- New Booking Translations ---
     bookNow: "立即预订",
     bookTrailer: "预订拖车",
     startDate: "开始日期",
@@ -112,6 +111,7 @@ export const trailersListingTranslations = {
     dailyRate: "每日费率",
     rentalDays: "租赁天数",
     totalCost: "总费用",
+    trailerUnavailable: "所选日期包含不可用的日期。",
   },
   fr: {
     price: "Prix",
@@ -134,7 +134,6 @@ export const trailersListingTranslations = {
     rentTrailerButton: "Louer une remorque",
     becomeHostTitle: "Devenir hôte",
     becomeHostDescription: "Répertoriez votre remorque et commencez à gagner de l'argent en aidant les autres à déménager, voyager et explorer. C'est facile et sécurisé.",
-    // --- New Booking Translations ---
     bookNow: "Réserver Maintenant",
     bookTrailer: "Réserver la Remorque",
     startDate: "Date de début",
@@ -150,5 +149,6 @@ export const trailersListingTranslations = {
     dailyRate: "Tarif journalier",
     rentalDays: "Jours de location",
     totalCost: "Coût total",
+    trailerUnavailable: "Les dates sélectionnées incluent des jours indisponibles.",
   }
 };

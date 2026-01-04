@@ -1,24 +1,58 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight, FaCloudUploadAlt, FaTimes } from "react-icons/fa";
 import CustomSwitch from "../../../components/Switch";
 import config from "../../../config";
 import toast from "react-hot-toast";
+import axios from "axios";
+const normalizeClosedDates = (input) => {
+    if (!input) return [];
+
+    let data = input;
+    while (typeof data === "string") {
+        try {
+            data = JSON.parse(data);
+        } catch {
+            break;
+        }
+    }
+    if (Array.isArray(data) && typeof data[0] === "string") {
+        try {
+            const parsed = JSON.parse(data[0]);
+            if (Array.isArray(parsed)) return parsed;
+        } catch { }
+    }
+
+    return Array.isArray(data) ? data : [];
+};
+const MAX_IMAGES = 10;
 
 const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
+    const wrapperRef = useRef(null);
     const [listingEnabled, setListingEnabled] = useState(true);
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("Utility");
     const [description, setDescription] = useState("");
+    const [hitchType, setHitchType] = useState("");
+    const [lightPlug, setLightPlug] = useState("");
+    const [weightCapacity, setWeightCapacity] = useState("");
+    const [make, setMake] = useState("");
+    const [model, setModel] = useState("");
+    const [year, setYear] = useState("");
+    const [length, setLength] = useState("");
+    const [ballSize, setBallSize] = useState("");
+    const [dimensions, setDimensions] = useState("");
     const [images, setImages] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
     const [closedDates, setClosedDates] = useState([]);
     const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
     const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+    const [locationInput, setLocationInput] = useState("");
     const [location, setLocation] = useState({ latitude: null, longitude: null, city: "", country: "" });
     const [dailyRate, setDailyRate] = useState(0);
     const [depositRate, setDepositRate] = useState(0);
     const [loading, setLoading] = useState(false);
-
+    const [suggestions, setSuggestions] = useState([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
     const maxDescChars = 300;
     const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
     const daysInThisMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -30,7 +64,8 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
             setCategory(trailerData.category);
             setDescription(trailerData.description);
             setExistingImages(trailerData.images || []);
-            setClosedDates(trailerData.closedDates || []);
+            const normalizedClosedDates = normalizeClosedDates(trailerData.closedDates);
+            setClosedDates(normalizedClosedDates);
             setLocation({
                 latitude: trailerData.latitude,
                 longitude: trailerData.longitude,
@@ -39,21 +74,15 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
             });
             setDailyRate(trailerData.dailyRate || 0);
             setDepositRate(trailerData.depositRate || 0);
-        } else {
-            if (!navigator.geolocation) return;
-            navigator.geolocation.getCurrentPosition(async (position) => {
-                const { latitude, longitude } = position.coords;
-                setLocation(prev => ({ ...prev, latitude, longitude }));
-                try {
-                    const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-                    const data = await res.json();
-                    setLocation(prev => ({
-                        ...prev,
-                        city: data.address.city || data.address.town || data.address.village || "",
-                        country: data.address.country || ""
-                    }));
-                } catch { }
-            });
+            setHitchType(trailerData.hitchType || "");
+            setLightPlug(trailerData.lightPlug || "");
+            setWeightCapacity(trailerData.weightCapacity || "");
+            setMake(trailerData.make || "");
+            setModel(trailerData.model || "");
+            setYear(trailerData.year || "");
+            setLength(trailerData.length || "");
+            setBallSize(trailerData.ballSize || "");
+            setDimensions(trailerData.dimensions || "");
         }
     }, [trailerData]);
 
@@ -72,9 +101,25 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
     };
     const handleImageUpload = (e) => {
         const files = Array.from(e.target.files);
-        if (images.length + files.length + existingImages.length > 4) return toast.error("Maximum 4 images allowed.");
-        setImages([...images, ...files]);
+
+        const remainingSlots =
+            MAX_IMAGES - (images.length + existingImages.length);
+
+        if (remainingSlots <= 0) {
+            toast.error(`Maximum ${MAX_IMAGES} photos allowed.`);
+            return;
+        }
+
+        const filesToAdd = files.slice(0, remainingSlots);
+
+        setImages(prev => [...prev, ...filesToAdd]);
+
+        if (files.length > remainingSlots) {
+            toast.error(`Only ${remainingSlots} more photo(s) can be added.`);
+        }
+        e.target.value = "";
     };
+
     const removeImage = (index) => setImages(images.filter((_, i) => i !== index));
     const removeExistingImage = (img) => setExistingImages(existingImages.filter(i => i !== img));
 
@@ -94,6 +139,15 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
         formData.append("dailyRate", dailyRate);
         formData.append("depositRate", depositRate);
         formData.append("closedDates", JSON.stringify(closedDates));
+        formData.append("hitchType", hitchType);
+        formData.append("lightPlug", lightPlug);
+        formData.append("weightCapacity", weightCapacity);
+        formData.append("make", make);
+        formData.append("model", model);
+        formData.append("year", year);
+        formData.append("length", length);
+        formData.append("ballSize", ballSize);
+        formData.append("dimensions", dimensions);
         existingImages.forEach(img => formData.append("existingImages[]", img));
         images.forEach(img => formData.append("images", img));
 
@@ -113,6 +167,78 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
         }
         setLoading(false);
     };
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+                setShowSuggestions(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const fetchSuggestions = async (inputText) => {
+        if (!inputText) {
+            setSuggestions([]);
+            return;
+        }
+
+        try {
+            const res = await axios.get(`https://lorepa-backend.vercel.app/api/autocomplete`, {
+                params: { input: inputText },
+            });
+
+            if (res.data.status === "OK") {
+                const filtered = res.data.predictions.filter((prediction) =>
+                    prediction.types.includes("locality") ||
+                    prediction.types.includes("country") ||
+                    prediction.types.includes("administrative_area_level_1")
+                );
+                setSuggestions(filtered);
+                setShowSuggestions(true);
+            } else {
+                setSuggestions([]);
+                setShowSuggestions(false);
+            }
+        } catch (error) {
+            console.error("Error fetching suggestions:", error);
+        }
+    };
+
+    const handleSelect = async (item) => {
+        try {
+            const res = await axios.get(`https://lorepa-backend.vercel.app/api/place-details`, {
+                params: { placeId: item.place_id },
+            });
+
+            const result = res.data.result;
+
+            let city = "";
+            let country = "";
+
+            result.address_components.forEach((c) => {
+                if (c.types.includes("locality")) city = c.long_name;
+                if (c.types.includes("country")) country = c.long_name;
+            });
+
+            setLocation({
+                latitude: result.geometry.location.lat,
+                longitude: result.geometry.location.lng,
+                city,
+                country,
+            });
+            setLocationInput(item.description);
+
+            setSuggestions([]);
+            setShowSuggestions(false);
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+
 
     if (!isOpen) return null;
 
@@ -149,6 +275,28 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
                                     <textarea rows="4" className="block w-full border border-gray-300 rounded-md py-2 px-3 outline-none resize-none" value={description} onChange={(e) => setDescription(e.target.value.slice(0, maxDescChars))} />
                                     <p className="text-xs text-gray-500 text-right">{description.length}/{maxDescChars}</p>
                                 </div>
+                                <div className="relative" ref={wrapperRef}>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                    <input
+                                        type="text"
+                                        className="block w-full border border-gray-300 rounded-md py-2 px-3 outline-none"
+                                        value={locationInput}
+                                        onChange={(e) => {
+                                            const value = e.target.value;
+                                            setLocationInput(value);
+                                            fetchSuggestions(value);
+                                        }}
+                                    />
+                                    {showSuggestions && suggestions.length > 0 && (
+                                        <ul className="absolute z-50 top-[4rem] left-0 right-0 bg-white shadow-md rounded-md mt-1 max-h-60 overflow-y-auto">
+                                            {suggestions.map((item, index) => (
+                                                <li key={index} onMouseDown={() => handleSelect(item)} className="p-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                                    {item.description}
+                                                </li>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </div>
                                 {location.city && location.country && <p className="text-sm text-gray-600 mt-2">Location: {location.city}, {location.country}</p>}
                                 <div className="grid grid-cols-1 gap-4">
                                     <div>
@@ -156,6 +304,75 @@ const AddTrailerModal = ({ isOpen, onClose, trailerData }) => {
                                         <input type="number" value={dailyRate} onChange={(e) => setDailyRate(e.target.value)} className="w-full border border-gray-300 rounded-md py-2 px-3 outline-none" />
                                     </div>
                                 </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium">Make</label>
+                                        <input value={make} onChange={e => setMake(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Model</label>
+                                        <input value={model} onChange={e => setModel(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Year</label>
+                                        <input type="number" value={year} onChange={e => setYear(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Length (ft)</label>
+                                        <input value={length} onChange={e => setLength(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Weight Capacity (lbs)</label>
+                                        <input value={weightCapacity} onChange={e => setWeightCapacity(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Ball Size</label>
+                                        <input value={ballSize} onChange={e => setBallSize(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Hitch Type</label>
+                                        <select value={hitchType} onChange={e => setHitchType(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none">
+                                            <option value="">Select</option>
+                                            <option>Receiver</option>
+                                            <option>Gooseneck</option>
+                                            <option>Fifth Wheel</option>
+                                        </select>
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium">Light Plug</label>
+                                        <select value={lightPlug} onChange={e => setLightPlug(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none">
+                                            <option value="">Select</option>
+                                            <option>4-pin</option>
+                                            <option>5-pin</option>
+                                            <option>6-pin</option>
+                                            <option>7-pin</option>
+                                        </select>
+                                    </div>
+
+                                    <div className="col-span-2">
+                                        <label className="block text-sm font-medium">Trailer Dimensions</label>
+                                        <input placeholder="e.g. 7 x 14 x 6"
+                                            value={dimensions}
+                                            onChange={e => setDimensions(e.target.value)}
+                                            className="w-full border rounded-md px-3 py-2 outline-none" />
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>

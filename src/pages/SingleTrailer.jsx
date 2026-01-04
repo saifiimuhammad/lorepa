@@ -10,6 +10,9 @@ import manImage from '../assets/dashboard/review1.jpg'
 import manImage2 from '../assets/dashboard/review2.jpg'
 import manImage3 from '../assets/dashboard/review3.jpg'
 import { singleTrailerTranslations } from './singleTrailerTranslations';
+import { trailersListingTranslations } from '../translations/trailerListing';
+import toast from 'react-hot-toast';
+import BookingModal from '../components/BookingModel';
 
 const reviews = [
   {
@@ -145,6 +148,9 @@ const ReviewCard = ({ name, rating, timeAgo, reviewText, avatar }) => (
 );
 
 const SingleTrailer = () => {
+  const isLogin = localStorage.getItem("userId");
+  const role = localStorage.getItem("role");
+
   const [trailer, setTrailer] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -153,10 +159,14 @@ const SingleTrailer = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const nav = useNavigate();
   const [randomReview, setRandomReview] = useState({});
-
+  const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [translations, setTranslations] = useState(() => {
     const storedLang = localStorage.getItem('lang');
     return singleTrailerTranslations[storedLang] || singleTrailerTranslations.fr;
+  });
+  const [translations2, setTranslations2] = useState(() => {
+    const storedLang = localStorage.getItem('lang');
+    return trailersListingTranslations[storedLang] || trailersListingTranslations.fr;
   });
 
   const getFaqData = (lang) => {
@@ -203,7 +213,9 @@ const SingleTrailer = () => {
     const handleStorageChange = () => {
       const storedLang = localStorage.getItem('lang');
       const currentTranslations = singleTrailerTranslations[storedLang] || singleTrailerTranslations.fr;
+      const currentTranslations2 = trailersListingTranslations[storedLang] || trailersListingTranslations.fr;
       setTranslations(currentTranslations);
+      setTranslations2(currentTranslations2);
       const faqs = getFaqData(currentTranslations);
       setFaqGuest(faqs.guest);
       setFaqHost(faqs.host);
@@ -249,8 +261,31 @@ const SingleTrailer = () => {
     );
   };
 
-  const handleDownloadAppClick = () => {
-    console.log("Download App button clicked!");
+  const handleBookingSubmit = async ({ trailerId, startDate, endDate, price }) => {
+    const userId = localStorage.getItem("userId");
+
+    if (!userId) {
+      toast.error("User not found");
+      return;
+    }
+
+    let loadingToast = toast.loading("Redirecting to payment...");
+
+    try {
+      const { data } = await axios.post(`${config.baseUrl}/stripe/create-checkout-session`, {
+        trailerId,
+        userId,
+        startDate,
+        endDate,
+        price,
+      });
+
+      toast.dismiss(loadingToast);
+      window.location.href = data.url;
+
+    } catch (error) {
+      toast.error("Payment failed", { id: loadingToast });
+    }
   };
 
   const currentLang = localStorage.getItem('lang') || 'en';
@@ -281,7 +316,7 @@ const SingleTrailer = () => {
           <img
             src={trailer.images?.[currentImageIndex] || `https://placehold.co/800x400/F3F4F6/9CA3AF?text=${encodeURIComponent(translations.noImage)}`}
             alt={trailer.title}
-            className="w-full h-96 object-cover"
+            className="w-full object-cover"
           />
           {trailer.images && trailer.images.length > 1 && (
             <>
@@ -306,8 +341,10 @@ const SingleTrailer = () => {
             <div className="border border-[#C3C3C3] p-5 rounded-lg mb-4">
               <h2 className="text-[20px] font-[600] text-[#0A0F18] mb-4">{translations.basicInfo}</h2>
               <div className="grid grid-cols-2 gap-2 text-sm">
-                <p className="text-gray-600">{translations.trailerId}</p>
-                <p className="text-gray-800 text-right truncate">{trailer._id}</p>
+                <p className="text-gray-600">{translations.trailerTitle}</p>
+                <p className="text-gray-800 text-right">{trailer.title}</p>
+                {/* <p className="text-gray-600">{translations.trailerId}</p>
+                <p className="text-gray-800 text-right truncate">{trailer._id}</p> */}
 
                 <p className="text-gray-600">{translations.nameOfOwner}</p>
                 <p className="text-gray-800 text-right">{trailer.userId?.name || translations.unknownOwner}</p>
@@ -315,8 +352,6 @@ const SingleTrailer = () => {
                 <p className="text-gray-600">{translations.category}</p>
                 <p className="text-gray-800 text-right">{trailer.category}</p>
 
-                <p className="text-gray-600">{translations.trailerTitleStatus}</p>
-                <p className="text-gray-800 text-right">{trailer.title}</p>
 
                 <p className="text-gray-600">{translations.detailedDescription}</p>
                 <p className="text-gray-800 text-right">{trailer.description}</p>
@@ -328,46 +363,47 @@ const SingleTrailer = () => {
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <p className='text-gray-600'>{translations.daily}</p>
                 <p className='text-gray-800 text-right'>${trailer.dailyRate}</p>
-
+                {/* 
                 <p className='text-gray-600'>{translations.deposit}</p>
-                <p className='text-gray-800 text-right'>${trailer.depositRate}</p>
+                <p className='text-gray-800 text-right'>${trailer.depositRate}</p> */}
               </div>
             </div>
           </div>
 
           <div>
 
-            {/* <div className="border border-[#C3C3C3] p-5 rounded-lg mb-4">
+            <div className="border border-[#C3C3C3] p-5 rounded-lg mb-4">
               <h2 className="text-[20px] font-[600] text-[#0A0F18] mb-4">{translations.trailerDetails}</h2>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <p className="text-gray-600">{translations.hitchType}</p>
-                <p className="text-gray-800 text-right">{trailer.hitchType || 'Bumper pull'}</p>
+                <p className="text-gray-800 text-right">{trailer.hitchType || '-'}</p>
 
                 <p className="text-gray-600">{translations.ballSize}</p>
-                <p className="text-gray-800 text-right">{trailer.ballSize || '3 inch'}</p>
+                <p className="text-gray-800 text-right">{trailer.ballSize || '-'}</p>
 
                 <p className="text-gray-600">{translations.weightCapacity}</p>
-                <p className="text-gray-800 text-right">{trailer.bearingCapacity || '50kg'}</p>
+                <p className="text-gray-800 text-right">{trailer.weightCapacity || '-'}</p>
 
                 <p className="text-gray-600">{translations.lightPlugConfiguration}</p>
-                <p className="text-gray-800 text-right">{trailer.lightPlugConfiguration || '000'}</p>
+                <p className="text-gray-800 text-right">{trailer.lightPlug || '-'}</p>
 
                 <p className="text-gray-600">{translations.trailerDimension}</p>
-                <p className="text-gray-800 text-right">{trailer.axleDimension || '00000'}</p>
+                <p className="text-gray-800 text-right">{trailer.dimensions || '-'}</p>
 
                 <p className="text-gray-600">{translations.year}</p>
-                <p className="text-gray-800 text-right">{trailer.year}</p>
+                <p className="text-gray-800 text-right">{trailer.year || '-'}</p>
 
                 <p className="text-gray-600">{translations.make}</p>
-                <p className="text-gray-800 text-right">{trailer.make}</p>
+                <p className="text-gray-800 text-right">{trailer.make || '-'}</p>
 
                 <p className="text-gray-600">{translations.model}</p>
-                <p className="text-gray-800 text-right">{trailer.model}</p>
+                <p className="text-gray-800 text-right">{trailer.model || '-'}</p>
 
-                <p className="text-gray-600">{translations.vin}</p>
-                <p className="text-gray-800 text-right">{trailer.vin || '-'}</p>
+                <p className="text-gray-600">{translations.length}</p>
+                <p className="text-gray-800 text-right">{trailer.length || '-'}</p>
               </div>
-            </div> */}
+            </div>
+
 
             {/* <div className="border border-[#C3C3C3] p-5 rounded-lg">
               <h3 className="text-[20px] font-[600] text-[#0A0F18] mb-4">{translations.finalSetup}</h3>
@@ -377,7 +413,7 @@ const SingleTrailer = () => {
               </div>
             </div> */}
 
-            <div className="border border-[#C3C3C3] p-5 rounded-lg mt-4">
+            {/* <div className="border border-[#C3C3C3] p-5 rounded-lg mt-4">
               <h2 className="text-[20px] font-[600] text-[#0A0F18] mb-4">{translations.ratingsAndReviews}</h2>
               <div className="flex items-center mb-4">
                 <span className="text-4xl font-bold text-gray-800 mr-2">5.0</span>
@@ -415,7 +451,7 @@ const SingleTrailer = () => {
               <button className="mt-6 bg-[#2563EB] text-white hover:underline text-sm p-3 rounded-md">
                 {translations.readMore}
               </button>
-            </div>
+            </div> */}
           </div>
         </motion.div>
 
@@ -425,12 +461,26 @@ const SingleTrailer = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4 }}
         >
-          <button onClick={handleDownloadAppClick} className="sm:w-fit w-[100%] text-nowrap mt-2 bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-md shadow-lg transition duration-200">
+          {/* <button onClick={handleDownloadAppClick} className="sm:w-fit w-[100%] text-nowrap mt-2 bg-gray-300 hover:bg-gray-400 text-gray-800 py-3 px-6 rounded-md shadow-lg transition duration-200">
             {translations.chatWithOwner}
-          </button>
-          <button onClick={() => nav('/login')} className="sm:w-fit w-[100%] text-nowrap mt-2 bg-[#2563EB] hover:bg-blue-700 text-white py-3 px-6 rounded-md shadow-lg transition duration-200" >
-            {translations.signupsignin}
-          </button>
+          </button> */}
+
+          {
+            (isLogin && role !== "owner") &&
+            <button
+              className='bg-blue-700 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-800 transition-colors'
+              onClick={()=>setIsBookingModalOpen(true)}
+            >
+              {translations2.bookNow}
+            </button>
+          }
+          {
+            !isLogin && (
+              <button onClick={() => nav('/login')} className="sm:w-fit w-[100%] text-nowrap mt-2 bg-[#2563EB] hover:bg-blue-700 text-white py-3 px-6 rounded-md shadow-lg transition duration-200" >
+                {translations.signupsignin}
+              </button>
+            )
+          }
         </motion.div>
 
         {/* FAQ Section */}
@@ -459,6 +509,15 @@ const SingleTrailer = () => {
 
         </div>
       </main>
+
+      <BookingModal
+        isOpen={isBookingModalOpen}
+        onClose={()=>setIsBookingModalOpen(false)}
+        trailer={trailer}
+        translations={translations2}
+        onSubmit={handleBookingSubmit}
+      />
+
 
       <Footer />
     </div>

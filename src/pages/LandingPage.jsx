@@ -348,7 +348,7 @@ const LandingPage = () => {
                             {showSuggestions && suggestions.length > 0 && (
                                 <ul className="absolute z-50 top-[4rem] left-0 right-0 bg-white shadow-md rounded-md mt-1 max-h-60 overflow-y-auto">
                                     {suggestions.map((item, index) => (
-                                        <li key={index} onClick={() => handleSelect(item)} className="p-2 hover:bg-gray-100 cursor-pointer text-sm">
+                                        <li key={index} onMouseDown={() => handleSelect(item)} className="p-2 hover:bg-gray-100 cursor-pointer text-sm">
                                             {item.description}
                                         </li>
                                     ))}
@@ -429,7 +429,7 @@ const LandingPage = () => {
 
                         {/* Search Button */}
                         <div className="w-full mt-2">
-                            <button onClick={()=>nav(buildSearchUrl())} className="w-full h-[3rem] bg-[#2563EB] rounded-md text-white">Search</button>
+                            <button onClick={() => nav(buildSearchUrl())} className="w-full h-[3rem] bg-[#2563EB] rounded-md text-white">Search</button>
                         </div>
                     </motion.div>
                 </motion.div>
