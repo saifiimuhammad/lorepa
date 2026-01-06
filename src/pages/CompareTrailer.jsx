@@ -67,6 +67,18 @@ const translations = {
             ["18ft Car Hauler", "$5,000", "$70", "$120", "$10,440"],
             ["10ft Dump Trailer", "$9,000", "$95", "$180", "$14,760"],
             ["5x8 Cargo Trailer", "$2,500", "$40", "$80", "$5,760"]
+        ],
+        comparisonTableTitle: "Turo vs Lorepa Comparison",
+        tableHeaders: ["Criterion", "Turo", "Lorepa"],
+        tableData: [
+            ["Asset Type", "Cars", "Trailers"],
+            ["Market", "Saturated", "Growing niche"],
+            ["Initial Investment", "High (vehicle)", "Low (trailer)"],
+            ["Maintenance", "Frequent", "Minimal"],
+            ["Insurance", "Complex, commercial", "Simple and tailored"],
+            ["Revenue Potential", "Variable", "Stable and predictable"],
+            ["Interface", "Advanced but dense", "Simple and intuitive"],
+            ["Community", "International", "Local and friendly"]
         ]
     },
     es: {
@@ -131,6 +143,18 @@ const translations = {
             ["Transportador de coches de 18 pies", "$5,000", "$70", "$120", "$10,440"],
             ["Remolque volquete de 10 pies", "$9,000", "$95", "$180", "$14,760"],
             ["Remolque de carga 5x8", "$2,500", "$40", "$80", "$5,760"]
+        ],
+        comparisonTableTitle: "Comparación Turo vs Lorepa",
+        tableHeaders: ["Criterio", "Turo", "Lorepa"],
+        tableData: [
+            ["Tipo de activo", "Coches", "Remolques"],
+            ["Mercado", "Saturado", "Nicho en crecimiento"],
+            ["Inversión inicial", "Alta (vehículo)", "Baja (remolque)"],
+            ["Mantenimiento", "Frecuente", "Mínimo"],
+            ["Seguro", "Complejo, comercial", "Simple y adaptado"],
+            ["Potencial de ingresos", "Variable", "Estable y predecible"],
+            ["Interfaz", "Avanzada pero densa", "Simple e intuitiva"],
+            ["Comunidad", "Internacional", "Local y amigable"]
         ]
     },
     cn: {
@@ -195,6 +219,18 @@ const translations = {
             ["18 英尺运车拖车", "$5,000", "$70", "$120", "$10,440"],
             ["10 英尺自卸拖车", "$9,000", "$95", "$180", "$14,760"],
             ["5x8 货运拖车", "$2,500", "$40", "$80", "$5,760"]
+        ],
+        comparisonTableTitle: "Turo 与 Lorepa 比较",
+        tableHeaders: ["标准", "Turo", "Lorepa"],
+        tableData: [
+            ["资产类型", "汽车", "拖车"],
+            ["市场", "饱和", "增长的利基市场"],
+            ["初始投资", "高（车辆）", "低（拖车）"],
+            ["维护", "频繁", "最少"],
+            ["保险", "复杂，商业化", "简单且定制化"],
+            ["收入潜力", "不稳定", "稳定且可预测"],
+            ["界面", "高级但复杂", "简单直观"],
+            ["社区", "国际化", "本地且友好"]
         ]
     },
     fr: {
@@ -259,6 +295,18 @@ const translations = {
             ["Transporteur de voitures 18 pieds", "$5 000", "$70", "$120", "$10 440"],
             ["Remorque benne 10 pieds", "$9 000", "$95", "$180", "$14 760"],
             ["Remorque cargo 5x8", "$2 500", "$40", "$80", "$5 760"]
+        ],
+        comparisonTableTitle: "Comparaison Turo vs Lorepa",
+        tableHeaders: ["Critère", "Turo", "Lorepa"],
+        tableData: [
+            ["Type d'actif", "Voitures", "Remorques"],
+            ["Marché", "Saturé", "Niche en croissance"],
+            ["Investissement initial", "Élevé (véhicule)", "Faible (remorque)"],
+            ["Entretien", "Fréquent", "Minimal"],
+            ["Assurance", "Complexe, commerciale", "Simple et personnalisée"],
+            ["Potentiel de revenus", "Variable", "Stable et prévisible"],
+            ["Interface", "Avancée mais dense", "Simple et intuitive"],
+            ["Communauté", "Internationale", "Locale et conviviale"]
         ]
     }
 };
@@ -424,41 +472,45 @@ const CompareTrailer = () => {
                     ))}
 
                     {/* ROI Tables with Animation (Kept as requested) */}
-                    {/* {roiTables.map((section, index) => (
-                        <motion.div
-                            key={index}
-                            initial="hidden"
-                            whileInView="visible"
-                            viewport={{ once: true, amount: 0.2 }}
-                            variants={sectionDelay(index + contentSections.length + 1)} // Adjust delay based on previous sections
-                        >
-                            <h2 className="text-3xl mt-8 mb-4">{section.title}</h2>
-                            <div className="overflow-x-auto mb-8">
-                                <table className="min-w-full bg-white border border-gray-200">
-                                    <thead>
-                                        <tr>
-                                            <th className="py-2 px-4 border text-left text-xs font-medium text-black">
-                                                {section.newHeader}
+                    <motion.div
+                        initial="hidden"
+                        whileInView="visible"
+                        viewport={{ once: true, amount: 0.2 }}
+                        variants={sectionDelay(contentSections.length + 1)}
+                    >
+                        <h2 className="text-3xl mt-8 mb-4">{translationsData.comparisonTableTitle}</h2>
+                        <div className="overflow-x-auto mb-8">
+                            <table className="min-w-full bg-white border border-gray-200">
+                                <thead>
+                                    <tr>
+                                        {translationsData.tableHeaders.map((header, i) => (
+                                            <th
+                                                key={i}
+                                                className="py-2 px-4 border text-left text-xs font-medium text-black"
+                                            >
+                                                {header}
                                             </th>
-                                            <th className="py-2 px-4 border text-left text-xs font-medium text-black">{translationsData.purchasePriceHeader}</th>
-                                            <th className="py-2 px-4 border text-left text-xs font-medium text-black">{translationsData.dailyRentalRateHeader}</th>
-                                            <th className="py-2 px-4 border text-left text-xs font-medium text-black">{translationsData.costHeader}</th>
-                                            <th className="py-2 px-4 border text-left text-xs font-medium text-black">{translationsData.incomeHeader}</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {section.data.map((row, rowIndex) => (
-                                            <tr key={rowIndex}>
-                                                {row.map((cell, cellIndex) => (
-                                                    <td key={cellIndex} className="py-2 px-4 border text-sm text-black">{cell}</td>
-                                                ))}
-                                            </tr>
                                         ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </motion.div>
-                    ))} */}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {translationsData.tableData.map((row, rowIndex) => (
+                                        <tr key={rowIndex}>
+                                            {row.map((cell, cellIndex) => (
+                                                <td
+                                                    key={cellIndex}
+                                                    className="py-2 px-4 border text-sm text-black"
+                                                >
+                                                    {cell}
+                                                </td>
+                                            ))}
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </motion.div>
+
                 </motion.div>
             </main>
 

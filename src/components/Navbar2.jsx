@@ -43,7 +43,6 @@ const Navbar2 = () => {
     const [translations, setTranslations] = useState(navBar2Translations[language] || navBar2Translations.fr);
     const [showLanguages, setShowLanguages] = useState(false);
     const [showNav, setshowNav] = useState(false);
-
     useEffect(() => {
         const handleStorageChange = () => {
             const storedLang = localStorage.getItem('lang') || 'en';
@@ -77,6 +76,7 @@ const Navbar2 = () => {
     };
 
     const handleSelect = (item) => { setLocation(item.description); setSuggestions([]); setShowSuggestions(false); };
+
 
     return (
         <nav className="border-b border-[#F1F1F1] bg-blue-600">
@@ -113,7 +113,7 @@ const Navbar2 = () => {
                             <div className="flex items-center">
                                 <input type="text" id="fromDate" value={fromDate} onChange={(e) => setFromDate(e.target.value)}
                                     className="block w-24 text-sm text-gray-900 border-none focus:ring-0 focus:outline-none p-0" />
-                                <input type="text" id="fromTime" value={fromTime} onChange={(e) => setFromTime(e.target.value)}
+                                <input type="time" id="fromTime" value={fromTime} onChange={(e) => setFromTime(e.target.value)}
                                     className="block w-20 text-sm text-gray-900 border-none focus:ring-0 focus:outline-none p-0 ml-2" />
                             </div>
                         </div>
@@ -123,7 +123,7 @@ const Navbar2 = () => {
                             <div className="flex items-center">
                                 <input type="text" id="untilDate" value={untilDate} onChange={(e) => setUntilDate(e.target.value)}
                                     className="block w-24 text-sm text-gray-900 border-none focus:ring-0 focus:outline-none p-0" />
-                                <input type="text" id="untilTime" value={untilTime} onChange={(e) => setUntilTime(e.target.value)}
+                                <input type="time" id="untilTime" value={untilTime} onChange={(e) => setUntilTime(e.target.value)}
                                     className="block w-20 text-sm text-gray-900 border-none focus:ring-0 focus:outline-none p-0 ml-2" />
                             </div>
                         </div>

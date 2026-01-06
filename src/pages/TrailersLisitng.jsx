@@ -59,6 +59,7 @@ const TrailersListing = () => {
   const [activeTrailer, setActiveTrailer] = useState(null);
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [selectedTrailerForBooking, setSelectedTrailerForBooking] = useState(null);
+  const [mapCenter, setMapCenter] = useState({ lat: 45.5017, lng: -73.5673 });
 
   const [translations, setTranslations] = useState(() => {
     const storedLang = localStorage.getItem('lang');
@@ -162,6 +163,35 @@ const TrailersListing = () => {
     lng: -73.5673,
   };
 
+
+  useEffect(() => {
+    const fetchCoordinates = async () => {
+      if (!cityFromQuery) return;
+
+      try {
+        const response = await axios.get('https://maps.googleapis.com/maps/api/geocode/json', {
+          params: {
+            address: cityFromQuery,
+            key: config.GOOGLE_API_KEY
+          }
+        });
+
+        const results = response.data.results;
+        if (results.length > 0) {
+          const location = results[0].geometry.location;
+          setMapCenter({ lat: location.lat, lng: location.lng });
+        } else {
+          // No results, fallback to Montreal
+          setMapCenter({ lat: 45.5017, lng: -73.5673 });
+        }
+      } catch (error) {
+        console.error('Error fetching geocode:', error);
+        setMapCenter({ lat: 45.5017, lng: -73.5673 });
+      }
+    };
+
+    fetchCoordinates();
+  }, [cityFromQuery]);
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <Navbar2 />
@@ -242,14 +272,15 @@ const TrailersListing = () => {
             {isLoaded && (
               <GoogleMap
                 mapContainerStyle={containerStyle}
-                center={
-                  trailers.length > 0
-                    ? {
-                      lat: parseFloat(trailers[0].latitude),
-                      lng: parseFloat(trailers[0].longitude),
-                    }
-                    : DEFAULT_CENTER
-                }
+                // center={
+                //   trailers.length > 0
+                //     ? {
+                //       lat: parseFloat(trailers[0].latitude),
+                //       lng: parseFloat(trailers[0].longitude),
+                //     }
+                //     : DEFAULT_CENTER
+                // }
+                center={mapCenter}
                 zoom={10}
               >
                 {trailers.map((trailer) => (
