@@ -5,7 +5,7 @@ import { FaCloudUploadAlt } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import config from "../config";
 
-const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) => {
+const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes, translations }) => {
     const [uploadType, setUploadType] = useState('Guest');
     const [selectedDocumentType, setSelectedDocumentType] = useState('');
     const [selectedTrailer, setSelectedTrailer] = useState('');
@@ -71,17 +71,18 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg w-full max-w-xl shadow-2xl">
                 <div className="p-5 border-b flex justify-between items-center">
-                    <h3 className="text-xl font-bold text-gray-800">Upload New Document</h3>
+                    <h3 className="text-xl font-bold text-gray-800">
+                        {translations.uploadModal.title}
+                    </h3>
                     <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition">
                         <IoClose className="text-2xl" />
                     </button>
                 </div>
 
                 <div className="p-6 space-y-5">
-                    
                     <div>
                         <label htmlFor="documentType" className="block text-sm font-medium text-gray-700 mb-1">
-                            Document Type
+                            {translations.uploadModal.selectDocumentType}
                         </label>
                         <select
                             id="documentType"
@@ -89,10 +90,10 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
                             onChange={(e) => setSelectedDocumentType(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                         >
-                            <option value="">Select Document Type</option>
+                            <option value="">{translations.uploadModal.selectDocumentType}</option>
                             {documentTypes.map((type) => (
                                 <option key={type} value={type}>
-                                    {type}
+                                    {translations.documentTypes[type.replace(/\s+/g, '').toLowerCase()] || type}
                                 </option>
                             ))}
                         </select>
@@ -100,7 +101,7 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
 
                     <div>
                         <label htmlFor="linkedTrailer" className="block text-sm font-medium text-gray-700 mb-1">
-                            Linked Trailer
+                            {translations.uploadModal.selectTrailer}
                         </label>
                         <select
                             id="linkedTrailer"
@@ -108,7 +109,7 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
                             onChange={(e) => setSelectedTrailer(e.target.value)}
                             className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-sm"
                         >
-                            <option value="">Select Trailer</option>
+                            <option value="">{translations.uploadModal.selectTrailer}</option>
                             {trailers.map((trailer) => (
                                 <option key={trailer._id} value={trailer._id}>
                                     {trailer.title}
@@ -119,7 +120,7 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
 
                     <div>
                         <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
-                            Description
+                            {translations.uploadModal.description}
                         </label>
                         <textarea
                             id="description"
@@ -153,10 +154,10 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
                             </p>
                         ) : (
                             <p className="text-sm text-gray-500">
-                                Drag & drop files here, or <span className="text-[#2563EB] font-medium">browse</span>
+                                {translations.uploadModal.dragDrop}
                             </p>
                         )}
-                        <p className="text-xs text-gray-400 mt-1">Max file size: 10MB</p>
+                        <p className="text-xs text-gray-400 mt-1">{translations.uploadModal.maxFileSize}</p>
                     </div>
                 </div>
 
@@ -166,7 +167,7 @@ const UploadNewDocumentModal = ({ isOpen, onClose, trailers, documentTypes }) =>
                         className="px-6 py-2 bg-[#2563EB] text-white rounded-lg font-medium hover:bg-blue-700 transition shadow-md disabled:bg-gray-400"
                         disabled={!selectedDocumentType || !selectedTrailer || !file}
                     >
-                        Upload Document
+                        {translations.uploadModal.uploadButton}
                     </button>
                 </div>
             </div>

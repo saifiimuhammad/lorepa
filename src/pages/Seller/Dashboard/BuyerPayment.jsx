@@ -1,32 +1,13 @@
 import React, { useState, useEffect } from 'react'
-import { FaDollarSign, FaCalendarAlt, FaDownload, FaCheckCircle, FaTimesCircle, FaUndo } from 'react-icons/fa'
-import { IoFunnelOutline, IoShareOutline } from 'react-icons/io5'
-import { FiClock } from 'react-icons/fi'
+import { FaDollarSign, FaCalendarAlt, FaDownload } from 'react-icons/fa'
+import { IoFunnelOutline } from 'react-icons/io5'
 import axios from 'axios'
 import config from '../../../config'
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
+import { earningsTranslations } from './translation/earningsTranslations'
 
 pdfMake.vfs = pdfFonts.vfs;
-const SHARED_COLOR = 'bg-green-100 text-green-700';
-const STATUS_MAP = {
-    paid: { color: SHARED_COLOR, icon: FaCheckCircle },
-    pending: { color: SHARED_COLOR, icon: FiClock },
-    refunded: { color: SHARED_COLOR, icon: FaUndo },
-    failed: { color: 'bg-red-100 text-red-700', icon: FaTimesCircle },
-    default: { color: 'bg-gray-100 text-gray-700', icon: FaCheckCircle },
-}
-
-const StatusChip = ({ status }) => {
-    const { color, icon: Icon } = STATUS_MAP[status.toLowerCase()] || STATUS_MAP.default
-    return (
-        <span className={`inline-flex items-center px-3 py-1 text-xs font-medium rounded-full ${color}`}>
-            <Icon className="mr-1 h-3 w-3" />
-            {status}
-        </span>
-    )
-}
-
 const MetricCard = ({ icon: Icon, title, value, subtext, iconBgColor, valueColor }) => (
     <div className="flex flex-col p-6 bg-white rounded-xl shadow-lg transition duration-300 hover:shadow-xl">
         <div className={`p-3 rounded-full ${iconBgColor}`}>
@@ -43,6 +24,23 @@ const MetricCard = ({ icon: Icon, title, value, subtext, iconBgColor, valueColor
 const EarningsDashboard = () => {
     const [transactions, setTransactions] = useState([])
     const [loading, setLoading] = useState(true)
+
+    // Get translations from localStorage
+    const [translations, setTranslations] = useState(() => {
+        const lang = localStorage.getItem("lang")
+        return earningsTranslations[lang] || earningsTranslations.fr
+    })
+
+    useEffect(() => {
+        const handleStorageChange = () => {
+            const lang = localStorage.getItem("lang")
+            setTranslations(earningsTranslations[lang] || earningsTranslations.fr)
+        }
+        window.addEventListener('storage', handleStorageChange)
+        handleStorageChange()
+        return () => window.removeEventListener('storage', handleStorageChange)
+    }, [])
+
     useEffect(() => {
         const userId = localStorage.getItem("userId")
         if (!userId) return
@@ -71,7 +69,7 @@ const EarningsDashboard = () => {
 
     const generatePDF = (singleTransaction = null) => {
         const tableBody = [
-            ["Date", "Transactor", "Amount", "Fee", "Status"]
+            translations.tableHeaders
         ];
 
         if (singleTransaction) {
@@ -116,6 +114,7 @@ const EarningsDashboard = () => {
             singleTransaction ? `transaction_${singleTransaction.date}.pdf` : "transaction_report.pdf"
         );
     };
+
     const getStatusClasses = (status) => {
         switch (status) {
             case 'paid':
@@ -130,38 +129,38 @@ const EarningsDashboard = () => {
     return (
         <div>
             <header className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
-                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 sm:mb-0">Earnings & Payouts</h1>
+                <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-4 sm:mb-0">{translations.pageTitle}</h1>
                 <button
                     onClick={() => generatePDF()}
                     className="flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition"
                 >
                     <FaDownload className="w-4 h-4 mr-2" />
-                    Download Report PDF
+                    {translations.downloadPDF}
                 </button>
             </header>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                 <MetricCard
                     icon={FaDollarSign}
-                    title="This Month's Revenue"
+                    title={translations.thisMonthRevenue}
                     value={`$${transactions.filter(t => t.status === 'paid').reduce((sum, t) => sum + t.amount, 0).toFixed(2)}`}
-                    subtext="vs last month +12%"
+                    subtext={translations.subtextRevenue}
                     iconBgColor="bg-green-100"
                     valueColor="text-green-600"
                 />
                 <MetricCard
                     icon={FaCalendarAlt}
-                    title="Pending Payouts"
+                    title={translations.pendingPayouts}
                     value={`$${transactions.filter(t => t.status === 'pending').reduce((sum, t) => sum + t.amount, 0).toFixed(2)}`}
-                    subtext="Next payout due in 3 days"
+                    subtext={translations.subtextPending}
                     iconBgColor="bg-yellow-100"
                     valueColor="text-yellow-600"
                 />
                 <MetricCard
                     icon={IoFunnelOutline}
-                    title="Transaction Fees & Service Charges"
+                    title={translations.feesAndCharges}
                     value="$0"
-                    subtext="Total Fees Deducted (YTD)"
+                    subtext={translations.subtextFees}
                     iconBgColor="bg-blue-100"
                     valueColor="text-blue-600"
                 />
@@ -169,11 +168,11 @@ const EarningsDashboard = () => {
 
             <div className="bg-white p-6 rounded-xl shadow-lg">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-xl font-semibold text-gray-800">Payout Transaction History</h2>
+                    <h2 className="text-xl font-semibold text-gray-800">{translations.tableTitle}</h2>
                 </div>
 
                 {loading ? (
-                    <p className="text-gray-500 text-center py-10">Loading transactions...</p>
+                    <p className="text-gray-500 text-center py-10">{translations.loading}</p>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="min-w-full divide-y divide-gray-200">
@@ -182,7 +181,7 @@ const EarningsDashboard = () => {
                                     <th className="w-12 px-2 py-3 text-left text-xs font-medium text-gray-500">
                                         <input type="checkbox" className="h-4 w-4 text-indigo-600 border-gray-300 rounded" />
                                     </th>
-                                    {['DATE', 'NAME OF TRANSACTOR', 'AMOUNT', 'STATUS', 'RECEIPT'].map((h) => (
+                                    {translations.tableHeaders.map((h) => (
                                         <th key={h} className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                                             {h}
                                         </th>
@@ -210,7 +209,7 @@ const EarningsDashboard = () => {
                                                     className="w-4 h-4 text-indigo-500 cursor-pointer hover:text-indigo-700"
                                                 />
                                             ) : (
-                                                <span className="text-gray-400">N/A</span>
+                                                <span className="text-gray-400">{translations.receiptNA}</span>
                                             )}
                                         </td>
                                     </tr>

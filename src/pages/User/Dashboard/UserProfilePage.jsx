@@ -4,6 +4,7 @@ import { FiUpload, FiLock, FiUser } from 'react-icons/fi';
 import axios from 'axios';
 import config from '../../../config';
 import toast from 'react-hot-toast';
+import { profileTranslations } from '../../Seller/Dashboard/translation/profileTranslations';
 
 const InputField = ({ label, value, placeholder, type = 'text', onChange, readOnly = false }) => (
     <div className="mb-4">
@@ -19,7 +20,8 @@ const InputField = ({ label, value, placeholder, type = 'text', onChange, readOn
     </div>
 );
 
-const PersonalInfoForm = ({ userData, setUserData, onSaveSuccess }) => {
+
+const PersonalInfoForm = ({ userData, setUserData, onSaveSuccess, t }) => {
     const [loading, setLoading] = useState(false);
     const profileInputRef = useRef(null);
 
@@ -74,20 +76,20 @@ const PersonalInfoForm = ({ userData, setUserData, onSaveSuccess }) => {
                 <p className="text-sm text-gray-500">Member Since: {new Date(userData.createdAt).getFullYear()}</p>
             </div>
 
-            <h3 className='text-xl font-bold text-gray-900 mb-6'>Personal Details</h3>
+            <h3 className='text-xl font-bold text-gray-900 mb-6'>{t.personalInfo}</h3>
 
             <form>
-                <InputField label="Full Name" value={userData.name} onChange={e => setUserData({ ...userData, name: e.target.value })} />
-                <InputField label="Email" value={userData.email} readOnly />
-                <InputField label="Phone" value={userData.phone} onChange={e => setUserData({ ...userData, phone: e.target.value })} />
-                <InputField label="Country (Optional)" value={userData.country || ""} onChange={e => setUserData({ ...userData, country: e.target.value })} />
-                <InputField label="State (Optional)" value={userData.state || ""} onChange={e => setUserData({ ...userData, state: e.target.value })} />
-                <InputField label="Address (Optional)" value={userData.address || ""} onChange={e => setUserData({ ...userData, address: e.target.value })} />
-                <InputField label="Street (Optional)" value={userData.street || ""} onChange={e => setUserData({ ...userData, street: e.target.value })} />
+                <InputField label={t.fullName} value={userData.name} onChange={e => setUserData({ ...userData, name: e.target.value })} />
+                <InputField label={t.email} value={userData.email} readOnly />
+                <InputField label={t.phone} value={userData.phone} onChange={e => setUserData({ ...userData, phone: e.target.value })} />
+                <InputField label={t.country} value={userData.country || ""} onChange={e => setUserData({ ...userData, country: e.target.value })} />
+                <InputField label={t.state} value={userData.state || ""} onChange={e => setUserData({ ...userData, state: e.target.value })} />
+                <InputField label={t.address} value={userData.address || ""} onChange={e => setUserData({ ...userData, address: e.target.value })} />
+                <InputField label={t.street} value={userData.street || ""} onChange={e => setUserData({ ...userData, street: e.target.value })} />
 
                 <div className="flex justify-end mt-6">
                     <button type="button" disabled={loading} onClick={handleSave} className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
-                        {loading ? "Saving..." : "Save Changes"}
+                        {loading ? t.saving : t.saveChanges}
                     </button>
                 </div>
             </form>
@@ -95,7 +97,7 @@ const PersonalInfoForm = ({ userData, setUserData, onSaveSuccess }) => {
     );
 };
 
-const SecuritySettings = () => {
+const SecuritySettings = ({ t }) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -119,13 +121,13 @@ const SecuritySettings = () => {
 
     return (
         <div className='space-y-8 p-8'>
-            <h3 className='text-xl font-bold text-gray-900 mb-6'>Password Management</h3>
-            <InputField label="Current Password" value={currentPassword} type="password" onChange={e => setCurrentPassword(e.target.value)} />
-            <InputField label="New Password" value={newPassword} type="password" onChange={e => setNewPassword(e.target.value)} />
-            <InputField label="Confirm New Password" value={confirmPassword} type="password" onChange={e => setConfirmPassword(e.target.value)} />
+            <h3 className='text-xl font-bold text-gray-900 mb-6'>{t.passwordManagement}</h3>
+            <InputField label={t.currentPassword} value={currentPassword} type="password" onChange={e => setCurrentPassword(e.target.value)} />
+            <InputField label={t.newPassword} value={newPassword} type="password" onChange={e => setNewPassword(e.target.value)} />
+            <InputField label={t.confirmPassword} value={confirmPassword} type="password" onChange={e => setConfirmPassword(e.target.value)} />
             <div className="mt-6">
                 <button type="button" disabled={loading} onClick={handleChangePassword} className="w-full sm:w-auto px-6 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
-                    {loading ? "Changing..." : "Change Password"}
+                    {loading ? t.changingPassword : t.newPassword}
                 </button>
             </div>
         </div>
@@ -179,7 +181,7 @@ const DocumentUploadBlock = ({ side, file, onFileSelect }) => {
     );
 };
 
-const DocumentUpload = ({ userData, setUserData }) => {
+const DocumentUpload = ({ userData, setUserData, t }) => {
     const [loading, setLoading] = useState(false);
 
     const handleUpload = async () => {
@@ -205,32 +207,32 @@ const DocumentUpload = ({ userData, setUserData }) => {
 
     return (
         <div className='p-8'>
-            <h3 className='text-xl font-bold text-gray-900 mb-6'>Driver's License Upload (Front & Back)</h3>
+            <h3 className='text-xl font-bold text-gray-900 mb-6'>{t.driversLicense}</h3>
             <div className='md:flex-row flex-col flex md:space-x-6 mb-2 flex-wrap'>
-                <DocumentUploadBlock side="Front" file={userData.licenseFrontImage || userData.licenseFrontImageUrl} onFileSelect={e => setUserData({ ...userData, licenseFrontImage: e.target.files[0], licenseFrontImageUrl: URL.createObjectURL(e.target.files[0]) })} />
-                <DocumentUploadBlock side="Back" file={userData.licenseBackImage || userData.licenseBackImageUrl} onFileSelect={e => setUserData({ ...userData, licenseBackImage: e.target.files[0], licenseBackImageUrl: URL.createObjectURL(e.target.files[0]) })} />
+                <DocumentUploadBlock side={t.front} file={userData.licenseFrontImage || userData.licenseFrontImageUrl} onFileSelect={e => setUserData({ ...userData, licenseFrontImage: e.target.files[0], licenseFrontImageUrl: URL.createObjectURL(e.target.files[0]) })} />
+                <DocumentUploadBlock side={t.back} file={userData.licenseBackImage || userData.licenseBackImageUrl} onFileSelect={e => setUserData({ ...userData, licenseBackImage: e.target.files[0], licenseBackImageUrl: URL.createObjectURL(e.target.files[0]) })} />
             </div>
             {
                 localStorage.getItem("role") === "owner" ?
                     <div>
-                        <h3 className='text-xl font-bold text-gray-900 mb-2'>Trailer Document</h3>
+                        <h3 className='text-xl font-bold text-gray-900 mb-2'>{t.trailerDocuments}</h3>
 
                         <div className='flex md:flex-row flex-col md:space-x-6 mb-8 flex-wrap'>
-                            <DocumentUploadBlock side="Trailer Insurance Policy Image" file={userData.trailerInsurancePolicyImage || userData.trailerInsurancePolicyImageURL} onFileSelect={e => setUserData({ ...userData, trailerInsurancePolicyImage: e.target.files[0], trailerInsurancePolicyImageURL: URL.createObjectURL(e.target.files[0]) })} />
-                            <DocumentUploadBlock side="Trailer Registration Image" file={userData.trailerRegistrationImage || userData.trailerRegistrationImageURL} onFileSelect={e => setUserData({ ...userData, trailerRegistrationImage: e.target.files[0], trailerRegistrationImageURL: URL.createObjectURL(e.target.files[0]) })} />
+                            <DocumentUploadBlock side={t?.trailerInsurancePolicyImage} file={userData.trailerInsurancePolicyImage || userData.trailerInsurancePolicyImageURL} onFileSelect={e => setUserData({ ...userData, trailerInsurancePolicyImage: e.target.files[0], trailerInsurancePolicyImageURL: URL.createObjectURL(e.target.files[0]) })} />
+                            <DocumentUploadBlock side={t?.trailerRegistrationImage} file={userData.trailerRegistrationImage || userData.trailerRegistrationImageURL} onFileSelect={e => setUserData({ ...userData, trailerRegistrationImage: e.target.files[0], trailerRegistrationImageURL: URL.createObjectURL(e.target.files[0]) })} />
                         </div>
                     </div>
                     :
                     <div>
-                        <h3 className='text-xl font-bold text-gray-900 mb-2'>Insurance</h3>
+                        <h3 className='text-xl font-bold text-gray-900 mb-2'>{t.insurance}</h3>
                         <div className='flex md:flex-row flex-col space-x-6 mb-8'>
-                            <DocumentUploadBlock side="Car Insurance Policy Image" file={userData.carInsurancePolicyImage || userData.carInsurancePolicyImageURL} onFileSelect={e => setUserData({ ...userData, carInsurancePolicyImage: e.target.files[0], carInsurancePolicyImageURL: URL.createObjectURL(e.target.files[0]) })} />
+                            <DocumentUploadBlock side={t.carInsurancePolicyImage} file={userData.carInsurancePolicyImage || userData.carInsurancePolicyImageURL} onFileSelect={e => setUserData({ ...userData, carInsurancePolicyImage: e.target.files[0], carInsurancePolicyImageURL: URL.createObjectURL(e.target.files[0]) })} />
                         </div>
                     </div>
             }
             <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
                 <button type="button" disabled={loading} onClick={handleUpload} className="w-full sm:w-auto px-8 py-3 text-sm font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition duration-150 shadow-md">
-                    {loading ? "Uploading..." : "Upload"}
+                    {loading ? t.uploading : t.upload}
                 </button>
             </div>
         </div>
@@ -248,6 +250,16 @@ const UserProfilePage = () => {
     const [activeTab, setActiveTab] = useState('personal');
     const [userData, setUserData] = useState({});
     const [kycStatus, setKycStatus] = useState('Not Verified');
+    const [lang, setLang] = useState(localStorage.getItem('lang') || 'fr');
+    const t = profileTranslations[lang];
+
+    // Listen for language changes
+    useEffect(() => {
+        const handleStorageChange = () => setLang(localStorage.getItem('lang') || 'en');
+        window.addEventListener('storage', handleStorageChange);
+        return () => window.removeEventListener('storage', handleStorageChange);
+    }, []);
+
 
     useEffect(() => {
         const urlTab = searchParams.get('tab');
@@ -278,26 +290,26 @@ const UserProfilePage = () => {
 
     return (
         <div className='space-y-6'>
-            <h1 className='text-2xl font-bold text-gray-900'>Profile & Settings</h1>
+            <h1 className='text-2xl font-bold text-gray-900'>{t.profileSettings}</h1>
             <div className='md:flex block bg-white rounded-xl shadow-lg'>
                 <div className='md:w-80 w-[100%] p-6 space-y-8'>
                     <div className='space-y-2 bg-white shadow-2xl rounded-xl p-4'>
-                        {Object.entries(TABS).map(([key, { label, icon: Icon }]) => (
+                        {Object.entries(TABS).map(([key, { icon: Icon }]) => (
                             <button key={key} onClick={() => setActiveTab(key)} className={`w-full flex items-center px-4 py-3 rounded-xl text-sm font-semibold transition duration-150 ${activeTab === key ? 'bg-blue-600 text-white shadow-md' : 'text-gray-700 hover:bg-gray-100'}`}>
                                 <Icon className='w-5 h-5 mr-3' />
-                                {label}
+                                {key === 'personal' ? t.personalInfo : key === 'security' ? t.security : t.documents}
                             </button>
                         ))}
                     </div>
                     <div className='p-4 rounded-xl bg-blue-50 border border-blue-200 space-y-2'>
-                        <p className='text-sm font-bold text-gray-900'>KYC Verification Status</p>
-                        <span className={`text-xl font-extrabold ${getKycStatusStyle(kycStatus)}`}>{kycStatus}</span>
+                        <p className='text-sm font-bold text-gray-900'>{t.kycStatus}</p>
+                        <span className={`text-xl font-extrabold ${getKycStatusStyle(kycStatus)}`}>{kycStatus === "Verified" ? t.verified : t.notVerified}</span>
                         <p className='text-xs text-blue-700'>Your identity documents are up-to-date and approved.</p>
-                        <button onClick={() => setActiveTab("documents")} className='w-full mt-2 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 transition'>View Documents</button>
+                        <button onClick={() => setActiveTab("documents")} className='w-full mt-2 py-2 text-sm font-medium text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-100 transition'>{t.viewDocuments}</button>
                     </div>
                 </div>
                 <div className='flex-1 p-6 bg-white shadow-2xl rounded-xl my-4'>
-                    <ActiveComponent userData={userData} setUserData={setUserData} onSaveSuccess={fetchUserProfile} />
+                    <ActiveComponent userData={userData} setUserData={setUserData} onSaveSuccess={fetchUserProfile} t={t} />
                 </div>
             </div>
         </div>

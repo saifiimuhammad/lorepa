@@ -1,87 +1,68 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FaEnvelope, FaMobileAlt, FaBell, FaCheckCircle } from 'react-icons/fa';
-import { IoWalletOutline } from 'react-icons/io5';
-import { MdOutlineDocumentScanner } from 'react-icons/md';
+import { FaEnvelope, FaMobileAlt, FaBell } from 'react-icons/fa';
 import config from '../../../config';
+import { userNotificationTranslations } from './translation/userNotificationTranslations';
 
-// --- Components ---
 
-/**
- * Custom Toggle Switch component
- */
+// --- Custom Toggle Switch ---
 const ToggleSwitch = ({ checked, onChange }) => (
   <label className="relative inline-flex items-center cursor-pointer">
-    <input type="checkbox" value="" className="sr-only peer" checked={checked} onChange={onChange} />
+    <input type="checkbox" className="sr-only peer" checked={checked} onChange={onChange} />
     <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer dark:bg-gray-400 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-green-500"></div>
   </label>
 );
 
-/**
- * Component for the Notification Preferences card (Left side)
- */
-const NotificationPreferences = ({ preferences, onToggle }) => {
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-lg h-fit">
-      <h2 className="text-lg font-bold text-gray-800 mb-6">Notification Preferences</h2>
+// --- Notification Preferences Card ---
+const NotificationPreferences = ({ preferences, onToggle, t }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg h-fit">
+    <h2 className="text-lg font-bold text-gray-800 mb-6">{t.notificationPreferences}</h2>
 
-      <div className="space-y-6">
-        {/* Email Notifications */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-start space-x-3">
-            <FaEnvelope className="text-xl text-[#2563EB] mt-1" />
-            <div>
-              <p className="font-semibold text-gray-700">Email Notifications</p>
-              <p className="text-sm text-gray-500 max-w-xs">Receive updates and booking confirmations via email.</p>
-            </div>
+    <div className="space-y-6">
+      {/* Email */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-start space-x-3">
+          <FaEnvelope className="text-xl text-[#2563EB] mt-1" />
+          <div>
+            <p className="font-semibold text-gray-700">{t.emailNotifications}</p>
+            <p className="text-sm text-gray-500 max-w-xs">{t.emailDescription}</p>
           </div>
-          <ToggleSwitch
-            checked={preferences.email}
-            onChange={() => onToggle('email')}
-          />
         </div>
-
-        {/* SMS Notifications */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-start space-x-3">
-            <FaMobileAlt className="text-xl text-[#2563EB] mt-1" />
-            <div>
-              <p className="font-semibold text-gray-700">SMS Notifications</p>
-              <p className="text-sm text-gray-500 max-w-xs">Get alerts about upcoming trips or status changes.</p>
-            </div>
-          </div>
-          <ToggleSwitch
-            checked={preferences.sms}
-            onChange={() => onToggle('sms')}
-          />
-        </div>
-
-        {/* In-App Notifications */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-start space-x-3">
-            <FaBell className="text-xl text-[#2563EB] mt-1" />
-            <div>
-              <p className="font-semibold text-gray-700">In-App Notifications</p>
-              <p className="text-sm text-gray-500 max-w-xs">Receive messages and system alerts in the app.</p>
-            </div>
-          </div>
-          <ToggleSwitch
-            checked={preferences.inApp}
-            onChange={() => onToggle('inApp')}
-          />
-        </div>
+        <ToggleSwitch checked={preferences.email} onChange={() => onToggle('email')} />
       </div>
 
-      <button className="w-full mt-8 py-2.5 bg-[#2563EB] text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-md shadow-blue-300/50">
-        Save Preferences
-      </button>
-    </div>
-  );
-};
+      {/* SMS */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-start space-x-3">
+          <FaMobileAlt className="text-xl text-[#2563EB] mt-1" />
+          <div>
+            <p className="font-semibold text-gray-700">{t.smsNotifications}</p>
+            <p className="text-sm text-gray-500 max-w-xs">{t.smsDescription}</p>
+          </div>
+        </div>
+        <ToggleSwitch checked={preferences.sms} onChange={() => onToggle('sms')} />
+      </div>
 
-/**
- * Component for a single activity item (Right side)
- */
+      {/* In-App */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-start space-x-3">
+          <FaBell className="text-xl text-[#2563EB] mt-1" />
+          <div>
+            <p className="font-semibold text-gray-700">{t.inAppNotifications}</p>
+            <p className="text-sm text-gray-500 max-w-xs">{t.inAppDescription}</p>
+          </div>
+        </div>
+        <ToggleSwitch checked={preferences.inApp} onChange={() => onToggle('inApp')} />
+      </div>
+    </div>
+
+    <button className="w-full mt-8 py-2.5 bg-[#2563EB] text-white font-semibold rounded-lg hover:bg-blue-700 transition shadow-md shadow-blue-300/50">
+      {t.savePreferences}
+    </button>
+  </div>
+);
+
+// --- Activity Item ---
 const ActivityItem = ({ icon, title, description, time, isNew }) => (
   <div className="flex items-center justify-between py-4 border-b border-gray-100 last:border-b-0">
     <div className='flex items-start'>
@@ -90,7 +71,7 @@ const ActivityItem = ({ icon, title, description, time, isNew }) => (
           {icon}
         </div>
       </div>
-      <div >
+      <div>
         <p className="font-medium flex-1 text-gray-800">{title}</p>
         <p className="text-sm text-gray-500">{description}</p>
       </div>
@@ -102,24 +83,19 @@ const ActivityItem = ({ icon, title, description, time, isNew }) => (
   </div>
 );
 
-/**
- * Component for the Recent Activity list (Right side)
- */
-const RecentActivity = ({ activities }) => {
-  return (
-    <div className="bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-lg font-bold text-gray-800 mb-2">Recent Activity</h2>
-      <div className="divide-y divide-gray-100">
-        {activities.map((activity, index) => (
-          <ActivityItem key={index} {...activity} />
-        ))}
-      </div>
+// --- Recent Activity List ---
+const RecentActivity = ({ activities, t }) => (
+  <div className="bg-white p-6 rounded-xl shadow-lg">
+    <h2 className="text-lg font-bold text-gray-800 mb-2">{t.recentActivity}</h2>
+    <div className="divide-y divide-gray-100">
+      {activities.map((activity, index) => (
+        <ActivityItem key={index} {...activity} />
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
 // --- Main Component ---
-
 const UserNotification = () => {
   const [preferences, setPreferences] = useState({
     email: true,
@@ -127,6 +103,10 @@ const UserNotification = () => {
     inApp: true,
   });
   const [activities, setActivities] = useState([]);
+  const [t, setT] = useState(() => {
+    const lang = localStorage.getItem("lang") || "fr";
+    return userNotificationTranslations[lang] || userNotificationTranslations.fr;
+  });
 
   const handleToggle = (key) => {
     setPreferences(prev => ({ ...prev, [key]: !prev[key] }));
@@ -153,22 +133,31 @@ const UserNotification = () => {
 
   useEffect(() => {
     fetchNotifications();
-  }, []);
 
+    const handleLangChange = () => {
+      const lang = localStorage.getItem("lang") || "fr";
+      setT(userNotificationTranslations[lang] || userNotificationTranslations.fr);
+    };
+
+    window.addEventListener("storage", handleLangChange);
+    handleLangChange();
+
+    return () => window.removeEventListener("storage", handleLangChange);
+  }, []);
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-8">Notifications</h1>
+      <h1 className="text-2xl font-bold text-gray-800 mb-8">{t.notifications}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Preferences */}
+        {/* Preferences */}
         <div className="lg:col-span-1">
-          <NotificationPreferences preferences={preferences} onToggle={handleToggle} />
+          <NotificationPreferences preferences={preferences} onToggle={handleToggle} t={t} />
         </div>
 
-        {/* Right Column: Activity */}
+        {/* Activity */}
         <div className="lg:col-span-2">
-          <RecentActivity activities={activities} />
+          <RecentActivity activities={activities} t={t} />
         </div>
       </div>
     </div>
