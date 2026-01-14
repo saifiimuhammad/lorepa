@@ -203,80 +203,91 @@ const UserDocument = () => {
     };
 
     return (
-        <div className="min-h-screen">
-            <div className="">
-                <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-bold text-gray-800">{translations.myDocuments}</h1>
-                    <button
-                        onClick={openUploadModal}
-                        className="flex items-center px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-blue-700 transition"
-                    >
-                        <FaPlus className="mr-2" />
-                        {translations.addNewDocument}
-                    </button>
-                </div>
-
-                <div className="flex justify-between items-center mb-6 pb-4">
-                    <div className="flex space-x-6 text-sm font-medium mb-[-0.5rem] border-b border-gray-200">
-                        {translations.tabs.map((tab) => (
-                            <button
-                                key={tab}
-                                onClick={() => setActiveTab(tab)}
-                                className={`pb-3 border-b-2 transition duration-300 ${activeTab === tab
-                                    ? 'border-blue-600 text-[#2563EB]font-semibold'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700'
-                                    }`}
-                            >
-                                {tab}
-                            </button>
-                        ))}
-                    </div>
-
-                    <div className="flex items-center space-x-3">
-                        <div className="relative">
-                            <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
-                            <input
-                                type="text"
-                                placeholder={translations.searchPlaceholder}
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-64 focus:ring-blue-500 focus:border-blue-500"
-                            />
-                        </div>
-                        <div className='bg-[#F2F2F2] p-2 rounded-md'>
-                            <FaCalendarAlt className="text-gray-500 text-xl cursor-pointer hover:text-[#2563EB] transition" />
-                        </div>
-                    </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {filteredDocuments.length > 0 ? (
-                        filteredDocuments.map((doc) => (
-                            <DocumentCard key={doc._id} doc={doc} onView={openViewerModal} onDownload={handleDownload} translations={translations} />
-                        ))
-                    ) : (
-                        <p className="col-span-full text-center text-gray-500 py-10">
-                            {translations.noDocumentsFound}
-                        </p>
-                    )}
-                </div>
-
-                <DocumentModal
-                    isOpen={isViewerModalOpen}
-                    onClose={closeViewerModal}
-                    document={selectedDocument}
-                    translations={translations}
-                />
-
-                <UploadNewDocumentModal
-                    isOpen={isUploadModalOpen}
-                    onClose={closeUploadModal}
-                    trailers={trailers}
-                    documentTypes={documentTypes}
-                    translations={translations}
-                />
+        <div className="min-h-screen px-4 sm:px-6 lg:px-8">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+                <h1 className="text-2xl font-bold text-gray-800">{translations.myDocuments}</h1>
+                <button
+                    onClick={openUploadModal}
+                    className="flex items-center px-4 py-2 bg-[#2563EB] text-white rounded-lg hover:bg-blue-700 transition w-full sm:w-auto justify-center"
+                >
+                    <FaPlus className="mr-2" />
+                    {translations.addNewDocument}
+                </button>
             </div>
+
+            {/* Tabs & Search */}
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 gap-4">
+                {/* Tabs */}
+                <div className="flex flex-wrap gap-3 text-sm font-medium border-b border-gray-200 w-full md:w-auto">
+                    {translations.tabs.map((tab) => (
+                        <button
+                            key={tab}
+                            onClick={() => setActiveTab(tab)}
+                            className={`pb-2 border-b-2 transition duration-300 ${activeTab === tab
+                                ? "border-blue-600 text-[#2563EB] font-semibold"
+                                : "border-transparent text-gray-500 hover:text-gray-700"
+                                }`}
+                        >
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+
+                {/* Search & Calendar */}
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 w-full md:w-auto">
+                    <div className="relative w-full sm:w-64">
+                        <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-sm" />
+                        <input
+                            type="text"
+                            placeholder={translations.searchPlaceholder}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg text-sm w-full focus:ring-blue-500 focus:border-blue-500"
+                        />
+                    </div>
+                    <div className="bg-[#F2F2F2] p-2 rounded-md">
+                        <FaCalendarAlt className="text-gray-500 text-xl cursor-pointer hover:text-[#2563EB] transition" />
+                    </div>
+                </div>
+            </div>
+
+            {/* Documents Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {filteredDocuments.length > 0 ? (
+                    filteredDocuments.map((doc) => (
+                        <DocumentCard
+                            key={doc._id}
+                            doc={doc}
+                            onView={openViewerModal}
+                            onDownload={handleDownload}
+                            translations={translations}
+                        />
+                    ))
+                ) : (
+                    <p className="col-span-full text-center text-gray-500 py-10">
+                        {translations.noDocumentsFound}
+                    </p>
+                )}
+            </div>
+
+            {/* Modals */}
+            <DocumentModal
+                isOpen={isViewerModalOpen}
+                onClose={closeViewerModal}
+                document={selectedDocument}
+                translations={translations}
+            />
+
+            <UploadNewDocumentModal
+                isOpen={isUploadModalOpen}
+                onClose={closeUploadModal}
+                trailers={trailers}
+                documentTypes={documentTypes}
+                translations={translations}
+            />
         </div>
+
     );
 };
 
