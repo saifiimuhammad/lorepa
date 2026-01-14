@@ -179,9 +179,9 @@ const BuyerMessaging = () => {
     <div className="flex h-[85vh] flex-col md:flex-row font-inter bg-gray-50">
       <div className="w-full md:w-1/3 lg:w-1/4 flex flex-col border-r border-gray-200 bg-white">
         <div className="p-4 border-b border-gray-200 flex space-x-3">
-          <button className="flex items-center justify-center w-full px-3 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
+          {/* <button className="flex items-center justify-center w-full px-3 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-md hover:bg-indigo-700 transition duration-150">
             <FaPlus className="w-4 h-4 mr-2" /> {translations.newMessage}
-          </button>
+          </button> */}
           <div className="relative w-full">
             <input
               type="text"
